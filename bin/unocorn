@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+STDOUT.sync = true
+
+STDOUT.puts "[#$$] #{File.basename($0)} started"
+
+signals = %i[ HUP USR1 USR2 TTIN TTOU WINCH INT QUIT TERM ]
+
+worker_pid = fork do
+
+  signals.each do |signal|
+    trap signal do
+      STDOUT.print "[#$$] signal #{signal.inspect} received by worker"
+      case signal
+      when :INT, :TERM
+        STDOUT.puts ", shutting down quickly."
+        exit
+      when :QUIT
+        STDOUT.puts ", shutting down gracefully."
+        exit
+      else
+        STDOUT.puts
+      end
+    end
+  end
+
+  sleep
+end
+
+signals = %i[ HUP USR1 USR2 TTIN TTOU WINCH INT QUIT TERM ]
+
+signals.each do |signal|
+  trap signal do
+    STDOUT.print "[#$$] signal #{signal.inspect} received by master"
+    case signal
+    when :INT, :TERM
+      STDOUT.puts ", shutting down quickly."
+      exit
+    when :QUIT
+      STDOUT.puts ", shutting down gracefully waiting for worker pid=#{worker_pid}."
+      Process.waitpid worker_pid
+      exit
+    else
+      STDOUT.puts
+    end
+  end
+end
+
+sleep

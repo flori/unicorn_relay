@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'unicorn_relay'
+
+# sv stop ...                    => service down/quit gracefully
+# sv stop ... ; sv interrupt ... => service down/terminate w/o grace
+UnicornRelay::Forker.new(
+  pid_file: ENV['PID_FILE']
+).start
