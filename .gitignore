@@ -3,8 +3,10 @@
 .DS_Store
 .byebug_history
 .rvmrc
+.yardoc
 Gemfile.lock
 coverage
 errors.lst
 pkg
 tags
+yard
