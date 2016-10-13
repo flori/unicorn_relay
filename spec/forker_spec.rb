@@ -11,7 +11,7 @@ describe UnicornRelay::Forker do
 
   let :forker do
     described_class.new(
-      script_path: 'foo/bar/unicorn_relay',
+      name:         'unicorn_relay',
       pid_file:     pid_file
     )
   end

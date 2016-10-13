@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2016-10-12"
+  s.date = "2016-10-13"
   s.description = "Allow controlling unicorn via supervise by relaying signals to it".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["unicorn_relay".freeze]

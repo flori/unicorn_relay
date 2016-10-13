@@ -1,8 +1,17 @@
+# This class forks a child unicorn process and handles relaying of signals to
+# it.
 class UnicornRelay::Forker
+
+  # This exception is caught in the start_control_loop method and stops its
+  # execution.
   class StopException < StandardError; end
 
-  def initialize(script_path: $0, pid_file: nil, argv: ARGV, env: ENV)
-    @name             = File.basename(script_path)
+  # @param name [ String ] The process name used in output and error messages (default is the basename of $0)
+  # @param pid_file [ String ] The path to the pid file of the unicorn master process
+  # @param argv [ Array ] The arguments for the forked unicorn process including the command itself (defaults to ARGV)
+  # @param env [ Hash ] The environment variables as a Hash used to fork the unicorn process (defaults to ENV)
+  def initialize(name: nil, pid_file: nil, argv: ARGV, env: ENV)
+    @name             = name ? name : File.basename($0)
     @pid_file         = pid_file
     @argv             = argv
     @env              = env
@@ -14,11 +23,17 @@ class UnicornRelay::Forker
     }
   end
 
+  # First attempts to handle unicorn process where the pid was given in
+  # pid_file, that is interrupts them. Then starts the control loop that reacts
+  # to signals and relays them to the newly forked processes.
   def start
     handle_old_pid_file
     start_control_loop
   end
 
+  # Stops the control loop if called in its context by raising a
+  # UnicornRelay::Forker::StopException. You usally never have to/should do
+  # this.
   def stop
     stop_control_loop
   end
@@ -127,10 +142,15 @@ class UnicornRelay::Forker
     pgid
   end
 
+  # @param signal [ Integer | Symbol | String ] a UNIX signal specifier
+  #
+  # Sends +signal+ to the controller unicorn processes.
   def signal_process_group(signal)
     Process.kill signal, -@pgid
   end
 
+  # Check if a shutdown signal is pending, that is still to be sent to the
+  # forked unicorn processes.
   def shutdown_signal_pending?
     @shutdown_signal && !@shutdown_signal_sent_at
   end
@@ -142,6 +162,8 @@ class UnicornRelay::Forker
     signal_process_group @shutdown_signal
   end
 
+  # Check if a shutdown signal was already sent a sufficient time ago and it
+  # might be time to try again.
   def shutdown_signal_sent_before?
     @shutdown_signal_sent_at && @shutdown_signal_sent_at - Time.now > 60
   end
