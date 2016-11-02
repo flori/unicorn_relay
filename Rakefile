@@ -14,7 +14,7 @@ GemHadar do
     '.AppleDouble', 'tags', '.byebug_history', '.DS_Store', 'errors.lst',
     '.yardoc', 'yard'
   readme      'README.md'
-  title       "#{name.camelize} -- More Math in Ruby"
+  title       "#{name.camelize} -- Control unicorn via signals"
   licenses    << 'Apache-2.0'
   executables << 'unicorn_relay'
 
